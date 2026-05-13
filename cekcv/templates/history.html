@@ -1,0 +1,156 @@
+{% extends "main_layout.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CekCV - Scan History</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+.container-history {
+  width: 95vw;
+  margin-top: 50px;
+  margin-left: -45px;
+  margin-right:0px;
+  margin-bottom: 300px;
+  padding: 30px;
+  background-color: #FBF6E2;
+  border-radius: 10px;
+  border: 2px solid #131842;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+    .history-title {
+      font-size: 25px;
+      color: #131842;
+      font-weight: 700;
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-top: 10px;
+    }
+
+    thead {
+      background-color: #131842;
+      color: #fff;
+    }
+
+    thead th {
+      padding: 16px;
+      font-size: 12px;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    tbody td {
+      padding: 14px;
+      text-align: center;
+      font-size: 12px;
+      color: #333;
+      border-bottom: 1px solid #ddd;
+    }
+
+    tbody tr:hover {
+      background-color: #f1f5ff;
+    }
+
+    .no-data {
+      text-align: center;
+      font-style: italic;
+      color: #6b7280;
+      padding: 20px;
+    }
+
+    .btn-login {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #131842;
+      color: white;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .btn-login:hover {
+      background-color: #2e368f;
+    }
+
+    @media (max-width: 768px) {
+      .container-history {
+        padding: 20px;
+      }
+
+      thead th, tbody td {
+        font-size: 13px;
+        padding: 10px;
+      }
+
+      .history-title {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-history">
+    <h1 class="history-title">Riwayat Scan Curriculum Vitae</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Total Scan</th>
+          <th>Tanggal Scan</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if not session['user_id'] %}
+        <tr>
+          <td colspan="2" class="no-data">Silakan login terlebih dahulu.</td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+          </td>
+        </tr>
+        {% elif results %}
+          {% for result in results %}
+          <tr>
+            <td>{{ result.total_scan }}</td>
+            <td>{{ result.scan_date.strftime('%d-%m-%Y') }}</td>
+          </tr>
+          {% endfor %}
+        {% else %}
+        <tr>
+          <td colspan="2" class="no-data">Belum ada riwayat scan tersedia.</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+</body>
+</html>
+{% endblock %}

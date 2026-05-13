@@ -1,0 +1,263 @@
+{% extends "main_layout.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEK YOUR FEEDBACK HERE</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <style>
+        /* Gaya yang sudah ada */
+        .scan-container {
+            background-color: #ffffff;
+            padding: 40px;
+            margin: 50px auto;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 100%;
+            max-width: 100%;
+            border-top: 4px solid #0056b3;
+            border-bottom: 4px solid #0056b3;
+            margin-top: 50px;
+            margin-bottom: 300px;
+            margin-left: 190px;
+        }
+        .titleh1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 40px;
+            margin-top: 1px;
+            color: #0056b3;
+            text-transform: uppercase;
+        }
+        .form-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 12px;
+        }
+        .form-section {
+            width: 48%;
+            background-color: #efefef;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        .upload-label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+            text-align: left;
+            color: #333;
+        }
+        .file-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #0056b3;
+            border-radius: 8px;
+            background-color: #9fbcd2;
+            transition: all 0.3s;
+        }
+        .file-input:hover {
+            background-color: #d2d8ec;
+        }
+        .preview-container {
+            margin-top: 10px;
+            text-align: center;
+        }
+        .preview-container canvas {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            max-width: 100%;
+        }
+        .submit-button {
+            background-color: #0056b3;
+            color: white;
+            padding: 10px 40px;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            margin-top: 30px;
+        }
+        .submit-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+        }
+
+        /* --- Gaya untuk Loading Animation --- */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column; /* Untuk menempatkan teks di bawah spinner */
+            color: white;
+            font-size: 1.2em;
+            text-align: center;
+            display: none; /* Sembunyikan secara default */
+        }
+
+        .spinner {
+            border: 8px solid rgba(255, 255, 255, 0.3);
+            border-top: 8px solid #E68369; /* Warna spinner, sesuaikan dengan tema Anda */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1.5s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 10px;
+        }
+        /* --- Akhir Gaya Loading Animation --- */
+    </style>
+</head>
+<body>
+    <div class="scan-container">
+        <h1 class="titleh1">CEK YOUR FEEDBACK HERE</h1>
+
+        <!-- {% if scan_disabled %}
+            <p style="color: red; font-weight: bold;">Free Scan 10x sudah Habis.</p>
+            <a href="{{ url_for('pricing') }}">Klik Untuk Berlangganan</a>
+        {% endif %} -->
+
+        <form action="{{ url_for('feedback') }}" method="post" enctype="multipart/form-data" id="feedback-form">
+            <div class="form-container">
+                <div class="form-section">
+                    <label class="upload-label" for="cv">Unggah 1 File CV (PDF)</label>
+                    <input id="cv-input" class="file-input" type="file" name="cv" required {% if scan_disabled and session['pricing'] not in ['plus', 'pro'] %}disabled{% endif %}>
+                    <div id="cv-preview" class="preview-container"></div>
+                </div>
+
+                <div class="form-section">
+                    <label class="upload-label" for="job_description">Unggah 1 File Deskripsi Pekerjaan (PDF)</label>
+                    <input id="job-input" class="file-input" type="file" name="job_description" required {% if scan_disabled and session['pricing'] not in ['plus', 'pro'] %}disabled{% endif %}>
+                    <div id="job-preview" class="preview-container"></div>
+                </div>
+            </div>
+            <input class="submit-button" type="submit" value="Feedback" {% if scan_disabled and session['pricing'] not in ['plus', 'pro'] %}disabled{% endif %}>
+        </form>
+    </div>
+
+    <!-- Modal Upgrade untuk Feedback -->
+<div class="modal fade" id="limitModal" tabindex="-1" role="dialog" aria-labelledby="limitModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content text-center p-4" style="border-radius: 15px;">
+            <div class="modal-header border-0 justify-content-center">
+                <h5 class="modal-title w-100 text-danger font-weight-bold" id="limitModalLabel">
+                    😢 Batas Feedback Habis!
+                </h5>
+                <button type="button" class="close position-absolute" style="right: 10px;" data-dismiss="modal" aria-label="Tutup">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">Anda sudah menggunakan 5x free feedback.<br><strong>Ayo upgrade sekarang!</strong> 🚀</p>
+                <a href="{{ url_for('pricing') }}" class="btn btn-warning text-white font-weight-bold px-4 rounded-pill">
+                    🔓 Unlock Fitur Plus
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text">
+            Menganalisis CV dan Deskripsi Pekerjaan, mohon tunggu...
+            <br>
+            Proses ini mungkin memakan waktu beberapa saat.
+        </div>
+    </div>
+
+    {% if scan_disabled %}
+<script>
+    window.addEventListener("DOMContentLoaded", () => {
+        $('#limitModal').modal('show');
+    });
+</script>
+{% endif %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const cvInput = document.getElementById("cv-input");
+            const cvPreview = document.getElementById("cv-preview");
+
+            const jobInput = document.getElementById("job-input");
+            const jobPreview = document.getElementById("job-preview");
+
+            const feedbackForm = document.getElementById("feedback-form"); // Dapatkan form
+            const loadingOverlay = document.getElementById("loading-overlay"); // Dapatkan overlay
+
+            cvInput.addEventListener("change", function () {
+                if(cvInput.files.length > 0){
+                    renderPDFPreview(cvInput.files[0], cvPreview);
+                }
+            });
+
+            jobInput.addEventListener("change", function () {
+                if(jobInput.files.length > 0){
+                    renderPDFPreview(jobInput.files[0], jobPreview);
+                }
+            });
+
+            function renderPDFPreview(file, container){
+                container.innerHTML = ""; // clear existing preview
+                const canvas = document.createElement("canvas");
+                container.appendChild(canvas);
+
+                const fileReader = new FileReader();
+                fileReader.onload = function() {
+                    const typedarray = new Uint8Array(this.result);
+                    pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                        pdf.getPage(1).then(function(page) {
+                            const viewport = page.getViewport({scale: 0.25});
+                            const context = canvas.getContext('2d');
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+
+                            page.render({
+                                canvasContext: context,
+                                viewport: viewport
+                            });
+                        });
+                    });
+                };
+                fileReader.readAsArrayBuffer(file);
+            }
+
+            // === LOGIKA UNTUK MENAMPILKAN LOADING SAAT SUBMIT FORM ===
+            feedbackForm.addEventListener("submit", function(event) {
+                // Cek apakah form valid sebelum menampilkan loading
+                if (feedbackForm.checkValidity()) {
+                    loadingOverlay.style.display = "flex"; // Tampilkan overlay
+                }
+                // Jika form tidak valid, browser akan menangani pesan validasi sendiri
+                // dan tidak akan submit, sehingga loading tidak perlu ditampilkan.
+            });
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

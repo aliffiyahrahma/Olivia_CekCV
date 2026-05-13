@@ -1,0 +1,147 @@
+{% extends "main_layout.html" %}
+{% block content %}
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f7f9fc;
+    margin: 0;
+    padding-top: 100px;
+  }
+  .container-feedback {
+    width: 100vw;
+    margin: 0;
+    margin-left: -86px;
+ margin-top: -70px;
+    padding: 40px 0;
+    box-sizing: border-box;
+    margin-bottom: 550px;
+  }
+
+  .feedback-title {
+    text-align: center;
+    font-size: 25px;
+    font-weight: bold;
+    color: #131842;
+    margin-bottom: 30px;
+  }
+
+  .feedback-table-wrapper {
+    overflow-x: auto;
+    padding: 0 20px;
+  }
+
+  .feedback-table {
+    width: 100%;
+    min-width: 1000px; /* Untuk menjaga kolom tetap rata saat di-scroll */
+    border-collapse: collapse;
+    background-color: #ffffff;
+    border-radius: 0;
+    margin-left: 8px;
+    margin-right: -70px;
+  }
+
+  .feedback-table th,
+  .feedback-table td {
+    padding: 16px;
+    text-align: left;
+    font-size: 12px;
+    border-bottom: 1px solid #c1bfbf;
+  }
+
+  .feedback-table th {
+    background-color: #d7d8da;
+    color: #131842;
+    text-transform: uppercase;
+  }
+
+  .feedback-row {
+    background-color: #fff;
+    transition: background 0.3s;
+    cursor: pointer;
+  }
+
+  .feedback-row:hover {
+    background-color: #f5faff;
+  }
+
+  .feedback-detail {
+    background-color: #f9fafb;
+    padding: 15px 30px;
+    font-size: 12px;
+    display: none;
+    border-left: 4px solid #E68369;
+  }
+
+  .feedback-detail h5 {
+    margin: 8px 0 4px;
+    color: #de0909;
+    font-size: 14px;
+  }
+
+  .feedback-detail p {
+    margin: 0 0 10px;
+    color: #555;
+    font-size: 13px;
+  }
+
+  .show {
+    display: table-row;
+  }
+
+  @media (max-width: 768px) {
+    .feedback-table {
+      font-size: 12px;
+    }
+
+    .feedback-table th, .feedback-table td {
+      padding: 12px;
+    }
+
+    .feedback-detail {
+      padding: 10px 20px;
+    }
+  }
+</style>
+
+<div class="container-feedback">
+  <div class="feedback-title">YOUR FEEDBACK HISTORY</div>
+
+  <div class="feedback-table-wrapper">
+    <table class="feedback-table">
+      <thead>
+        <tr>
+          <th>Tanggal</th>
+          <th>Curricullum Vitae</th>
+          <th>Score</th>
+          <th>Detail</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for result in results %}
+        <tr class="feedback-row" onclick="toggleDetail('{{ loop.index }}')">
+          <td>{{ result.scan_date.strftime('%d %B %Y') }}</td>
+          <td>{{ result.cv_text.split()[:3] | join(' ') }}</td>
+          <td>{{ result.score }}%</td>
+          <td><button style="padding: 6px 10px; background: #E68369; color: white; border: none; border-radius: 3px;">See</button></td>
+        </tr>
+        <tr class="feedback-detail" id="detail-{{ loop.index }}">
+          <td colspan="4">
+            {% for item in result.feedback %}
+              <h5>{{ item.judul }}</h5>
+              <p>{{ item.saran }}</p>
+            {% endfor %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  function toggleDetail(id) {
+    const detail = document.getElementById('detail-' + id);
+    detail.classList.toggle('show');
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,343 @@
+{% extends "main_layout.html" %}
+{% block content %}
+
+<style>
+    .file-input-wrapper {
+        position: relative;
+        width: 100%;
+        padding: 30px;
+        border: 2px dashed #E68369;
+        border-radius: 8px;
+        background-color: #fef8f5;
+        font-size: 14px;
+        transition: background-color 0.3s;
+        box-sizing: border-box;
+        min-height: 150px;
+        overflow-x: auto;
+      
+    }
+    
+        .file-input-wrapper2 {
+        margin-top: 20px;
+        position: relative;
+        width: 100%;
+        padding: 30px;
+        border: 2px dashed #E68369;
+        border-radius: 8px;
+        background-color: #fef8f5;
+        font-size: 14px;
+        transition: background-color 0.3s;
+        box-sizing: border-box;
+        min-height: 150px;
+        overflow-x: auto;
+      
+    }
+
+    .file-input-cv {
+        border: none;
+        background-color: transparent;
+        padding: 0;
+        margin: 0;
+        min-height: 150px;
+        border-radius: 0;
+    }
+
+    .file-list-display {
+        display: flex;
+        gap: 10px;
+        pointer-events: auto;
+        overflow-x: auto;
+    }
+
+    .file-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 80px;
+    }
+
+    .file-item canvas {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .file-name {
+        font-size: 12px;
+        text-align: center;
+        word-break: break-word;
+        margin-top: 4px;
+    }
+
+    .remove-btn {
+        color: red;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 2px;
+    }
+
+    /* --- Gaya untuk Loading Animation --- */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        flex-direction: column;
+        color: white;
+        font-size: 1.2em;
+        text-align: center;
+        display: none;
+    }
+
+    .spinner {
+        border: 8px solid rgba(255, 255, 255, 0.3);
+        border-top: 8px solid #E68369;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1.5s linear infinite;
+        margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+        margin-top: 10px;
+    }
+</style>
+
+<div class="scan__input">
+    <h1 class="titleh1">SCAN YOUR CV HERE</h1>
+
+    <!-- {% if scan_disabled %}
+        <p style="color: red; font-weight: bold;">Free Scan 10x sudah Habis.</p>
+        <a href="{{ url_for('pricing') }}">Klik Untuk Berlangganan</a>
+    {% endif %} -->
+
+    {% if session['pricing'] in ['plus', 'pro'] %}
+    {% endif %}
+
+<form class="upload-form" action="{{ url_for('scan') }}" method="post" enctype="multipart/form-data" id="scan-form">
+
+        <div class="file-input-wrapper">
+   
+                   <div>
+                <p class="upload-label-cv" for="cv">Unggah File CV (PDF) :</p>
+                <p class="upload-label-cv" for="job">Minimal 3 file</p> </div>
+            <input id="cv-input" class="file-input-cv" type="file" name="cv[]" multiple required {% if scan_disabled and session['pricing'] not in ['plus', 'pro'] %}disabled{% endif %}>
+            <div id="file-list" class="file-list-display"></div>
+        </div>
+        
+
+        <div class="file-input-wrapper2">
+            <div>
+                <p class="upload-label-cv" for="job">Unggah File Job Description (PDF) :</p>
+                <p class="upload-label-cv" for="job">Maksimal 1 file</p> </div>
+            <input id="job-input" class="file-input-cv" type="file" name="job_description" required {% if scan_disabled and session['pricing'] not in ['plus', 'pro'] %}disabled{% endif %}>
+            <div id="job-list" class="file-list-display"></div>
+        </div>
+    
+       <input class="submit-button" style="margin-top: 10px;" type="submit" value="Scan" {% if scan_disabled and session['pricing'] not in ['plus', 'pro'] %}disabled{% endif %}>
+
+    </form>
+</div>
+
+<div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-text">
+        Scanning CV Anda, mohon tunggu...
+        <br>
+        Proses ini mungkin memakan waktu beberapa saat tergantung jumlah CV.
+    </div>
+</div>
+
+<div class="modal fade" id="limitModal" tabindex="-1" role="dialog" aria-labelledby="limitModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content text-center p-4" style="border-radius: 15px;">
+            <div class="modal-header border-0 justify-content-center">
+                <h5 class="modal-title w-100 text-danger font-weight-bold" id="limitModalLabel">
+                    😢 Batas Scan Habis!
+                </h5>
+                <button type="button" class="close position-absolute" style="right: 10px;" data-dismiss="modal" aria-label="Tutup">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">Anda sudah menggunakan 5x free scan.<br><strong>Ayo upgrade sekarang!</strong> 🚀</p>
+                <a href="{{ url_for('pricing') }}" class="btn btn-warning text-white font-weight-bold px-4 rounded-pill">
+                    🔓 Unlock Fitur Plus
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if scan_disabled %}
+<script>
+    window.addEventListener("DOMContentLoaded", () => {
+        $('#limitModal').modal('show');
+    });
+</script>
+{% endif %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+</script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // === VARIABEL INPUT DAN PREVIEW ===
+        const cvInput = document.getElementById("cv-input");
+        const cvListContainer = document.getElementById("file-list");
+        let selectedCVs = [];
+
+        const jobInput = document.getElementById("job-input");
+        const jobListContainer = document.getElementById("job-list");
+        let selectedJob = null;
+
+        const scanForm = document.getElementById("scan-form");
+        const loadingOverlay = document.getElementById("loading-overlay");
+
+        // === EVENT LISTENER UNTUK CV (MULTIPLE) ===
+        cvInput.addEventListener("change", function () {
+            selectedCVs = Array.from(cvInput.files);
+            updateCVList();
+            // Hapus atribut 'required' setelah file dipilih
+            if (selectedCVs.length > 0) {
+                cvInput.removeAttribute('required');
+            } else {
+                cvInput.setAttribute('required', '');
+            }
+        });
+
+        function updateCVList() {
+            cvListContainer.innerHTML = "";
+            selectedCVs.forEach((file, index) => {
+                const fileItem = createFileItem(file, index, "cv");
+                cvListContainer.appendChild(fileItem);
+                renderPDFPreview(file, fileItem.querySelector("canvas"));
+            });
+
+            // Tampilkan input jika tidak ada file yang dipilih
+            if (selectedCVs.length === 0) {
+                cvInput.style.display = "block";
+            } else {
+                cvInput.style.display = "none";
+            }
+        }
+
+        window.removeCV = function(index) {
+            selectedCVs.splice(index, 1);
+            updateCVList();
+        };
+
+        // === EVENT LISTENER UNTUK JOB DESCRIPTION (SINGLE) ===
+        jobInput.addEventListener("change", function () {
+            if(jobInput.files.length > 0){
+                selectedJob = jobInput.files[0];
+                updateJobPreview();
+                // Hapus atribut 'required' setelah file dipilih
+                jobInput.removeAttribute('required');
+            } else {
+                jobInput.setAttribute('required', '');
+            }
+        });
+
+        function updateJobPreview() {
+            jobListContainer.innerHTML = "";
+            const fileItem = createFileItem(selectedJob, null, "job");
+            jobListContainer.appendChild(fileItem);
+            renderPDFPreview(selectedJob, fileItem.querySelector("canvas"));
+
+            // Tampilkan input jika tidak ada file yang dipilih
+            if (!selectedJob) {
+                jobInput.style.display = "block";
+            } else {
+                jobInput.style.display = "none";
+            }
+        }
+
+        window.removeJob = function(){
+            selectedJob = null;
+            jobInput.value = "";
+            jobListContainer.innerHTML = "";
+            jobInput.setAttribute('required', ''); // Tambahkan kembali 'required'
+            jobInput.style.display = "block";
+        };
+
+        // === FUNGSI MEMBUAT FILE ITEM (UMUM UNTUK CV & JOB) ===
+        function createFileItem(file, index, type) {
+            const fileItem = document.createElement("div");
+            fileItem.classList.add("file-item");
+
+            const canvas = document.createElement("canvas");
+            canvas.width = 80;
+            canvas.height = 100;
+
+            const fileName = document.createElement("div");
+            fileName.classList.add("file-name");
+            fileName.textContent = file.name;
+
+            const removeBtn = document.createElement("div");
+            removeBtn.classList.add("remove-btn");
+            removeBtn.innerHTML = "&times;";
+            removeBtn.onclick = function() {
+                if(type === "cv") removeCV(index);
+                if(type === "job") removeJob();
+            };
+
+            fileItem.appendChild(canvas);
+            fileItem.appendChild(fileName);
+            fileItem.appendChild(removeBtn);
+            return fileItem;
+        }
+
+        // === FUNGSI RENDER PDF PREVIEW MENGGUNAKAN PDF.JS ===
+        function renderPDFPreview(file, canvas){
+            if (!file) return;
+
+            const fileReader = new FileReader();
+            fileReader.onload = function() {
+                const typedarray = new Uint8Array(this.result);
+                pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                    pdf.getPage(1).then(function(page) {
+                        const viewport = page.getViewport({scale: 0.25});
+                        const context = canvas.getContext('2d');
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+
+                        page.render({
+                            canvasContext: context,
+                            viewport: viewport
+                        });
+                    });
+                });
+            };
+            fileReader.readAsArrayBuffer(file);
+        }
+
+        // === LOGIKA UNTUK MENAMPILKAN LOADING SAAT SUBMIT FORM ===
+        scanForm.addEventListener("submit", function(event) {
+            // Kita sudah mengelola atribut 'required' di JavaScript, jadi form seharusnya valid
+            if (scanForm.checkValidity()) {
+                loadingOverlay.style.display = "flex";
+            }
+        });
+        
+        // Panggil updateCVList dan updateJobPreview saat DOM dimuat
+        updateCVList();
+        updateJobPreview();
+    });
+</script>
+
+{% endblock %}

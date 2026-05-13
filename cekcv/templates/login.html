@@ -1,0 +1,59 @@
+{% extends "main_layout.html" %}
+{% block content %}
+<title>CekCV - Dashboard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+<div class="container custom-container">
+    <div class="row">
+        <!-- Kolom untuk Form Login -->
+         <div class="col-md-12">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="alert-messages">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+         </div>
+        <div class="col-md-6 login-form-container">
+            <h1 class="login-title">Login Here!</h1>
+            <div class="social-buttons">
+                <!-- Tombol Sign in dengan Google -->
+                <button type="button" class="btn btn-google" onclick="window.location.href='{{ url_for('login_google') }}'">
+                    <img src="{{ url_for('static', filename='image/google.png') }}" alt="Google Icon" class="icon-google">
+                    Sign in with Google
+                </button>
+                
+              
+            </div>
+
+            <!-- Form Login -->
+            <form action="{{ url_for('req_login') }}" method="post">
+                <div class="form-outline mb-1">
+                    <label class="form-label" for="loginEmail">Email</label>
+                    <input type="email" name="email" id="loginEmail" class="form-control" placeholder="" />
+                </div>
+
+                <div class="form-outline mb-1">
+                    <label class="form-label" for="loginPassword">Password</label>
+                    <input type="password" name="password" id="loginPassword" class="form-control" placeholder="" />
+                </div>
+
+                <!-- Tombol Login -->
+                <button type="submit" class="btn btn-login">Login</button>
+
+                <!-- Link untuk Mendaftar -->
+                <div class="register-link">
+                    <p>Not Registered? <a href="{{ url_for('register') }}">Create an account</a></p>
+                </div>
+            </form>
+        </div>
+
+        <!-- Kolom untuk Gambar -->
+        <div class="col-md-6">
+            <img src="{{ url_for('static', filename='image/login.png') }}" alt="login" class="login-image">
+        </div>
+    </div>
+</div>
+{% endblock %}

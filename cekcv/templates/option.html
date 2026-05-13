@@ -1,0 +1,72 @@
+{% extends "main_layout.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halaman Cek</title>
+    <style>
+        
+        .container {
+            display: flex;
+            gap: 20px;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin-left: 110px;
+            margin-top: -100px;
+        }
+        .card-option {
+            background-color: #054a93;
+            color: white;
+            width: 380px;
+            height: 400px;
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-top: 50px;
+           
+        }
+        .card-option img {
+            width: 100%;
+            border-radius: 1px;
+            margin-left: 5px;
+        }
+        .card-option button {
+            margin-top: 15px;
+            padding: 8px;
+            width: 100%;
+            background-color: white;
+            color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .card-option button:hover {
+            background-color: #0056b3;
+            color: white;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+         {% if user_role != 'Pelamar' %}
+        <div class="card-option">
+            <img src="static/image/cekcv.png" alt="Cek CV">
+            <a href="{{ url_for('scan') }}"><button>Cek CV</button> </a>
+        </div>
+        {% endif %}
+        <div class="card-option">
+            <img src="static/image/cekfeedback.png" alt="Cek Feedback">
+            <a href="{{ url_for('feedback') }}"><button>Cek Feedback</button> </a>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}

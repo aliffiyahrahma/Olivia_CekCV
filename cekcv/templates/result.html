@@ -1,0 +1,252 @@
+{% extends "main_layout.html" %}
+{% block content %}
+<style>
+    .col-md-8 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+
+    /* Gaya tombol print */
+    .print-button-container {
+        margin-top: 20px;
+        text-align: center;
+    }
+    .print-button {
+        background-color: #3a7ac4ff; /* Warna hijau */
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .print-button:hover {
+        background-color: #45a049;
+    }
+</style>
+<div class="row" style="margin-top: 100px; margin-bottom: 30px;">
+        {% if top_3_data %}
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Job Description</h4>
+                </div>
+                <div class="card-body" style="text-align: justify;">
+                    <p>{{ job_desc }}</p>
+                </div>
+            </div>
+           
+                <div class="print-button-container">
+                <form action="{{ url_for('generate_print_pdf') }}" method="post">
+                    <button type="submit" class="print-button">Print Laporan PDF</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="col-md-7">
+            <div class="accordion" id="cvAccordion">
+                {% for result in top_3_data %}
+                <div class="card">
+                    <div class="card-header bg-white" id="heading{{ loop.index }}">
+                        <h5 class="mb-0">
+                            <button class="btn btn-linzk text-dark fw-bold w-100 text-start" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}">
+                                {{ result.cv_path.split('\\')[-1] }} <span class="score">Match Score : {{ result.similarity_score_percent|round(2) }}%</span>
+                            </button>
+                        </h5>
+                    </div>
+                     <div id="collapse{{ loop.index }}" class="collapse" data-bs-parent="#cvAccordion">
+                        <div class="card-body">
+                        
+                <div class="section-title"></div>
+                <p>{{ result.cv_head | safe }}</p>
+
+                <div class="section-title">Riwayat Pendidikan & Pengalaman Kerja</div>
+                <p>{{ result.cv_middle | safe }}</p>
+
+                <div class="section-title">Hard Skill & Soft Skill</div>
+                <p>{{ result.cv_tail | safe }}</p>
+
+                {% if result.keywords %}
+                <div class="highlight-keywords">
+                    <strong>Kata Kunci yang Dihighlight:</strong><br>
+                    {{ result.keywords | join(', ') }}
+                </div>
+                {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        
+        </div>
+
+        {% else %}
+        <div class="card">
+            <div class="card-body">
+                <p>Gagal melakukan scan atau tidak ada hasil yang ditemukan.</p>
+                <a href="{{ url_for('scan') }}" class="btn btn-secondary">Kembali ke Scan</a>
+            </div>
+        </div>
+        {% endif %}
+
+{% if feedback_section %}
+<hr style="margin: 50px 0;">
+<h3 class="mb-4">Feedback</h3>
+
+{% for item in feedback_section %}
+<div class="container mb-5" style="display: flex; gap: 30px;">
+    <!-- LEFT: Embed PDF -->
+      <div style="flex: 1; margin-top:130px">
+        <h5 style="margin-bottom: 10px;">{{ item.filename }}</h5>
+        <embed id="embed{{ loop.index }}" src="{{ item.cv_pdf_url }}" type="application/pdf"
+               style="width: 100%; height: 300px; border-radius: 10px;">
+    </div>
+    <!-- RIGHT: Feedback and Score -->
+   <div  id="feedback-col{{ loop.index }}" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+        <div class="donut-container" style="position: relative; width: 130px; height: 130px; margin-bottom: 10px;">
+            <canvas id="donutChart{{ loop.index }}"></canvas>
+            <div class="donut-label" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-weight:bold;">
+                {{ item.score }}%
+            </div>
+        </div>
+                    {% if item.spam_keywords %}
+        <div class="alert alert-warning text-start w-100">
+            🚫 <strong>Kata Berulang Terdeteksi:</strong><br>
+            Kami mendeteksi penggunaan kata yang berulang terlalu banyak. Hal ini bisa menurunkan kredibilitas CV Anda.<br>
+            <ul class="mt-2">
+                {% for word, count in item.spam_keywords.items() %}
+                <li><strong>{{ word }}</strong> ({{ count }}x)</li>
+                {% endfor %}
+            </ul>
+            <div class="mt-2 text-muted" style="font-size: 14px;">
+                <em>Saran:</em> Gunakan variasi kata atau ringkas penggunaan keyword agar tetap natural dan profesional.
+            </div>
+        </div>
+
+            {% endif %}
+        <div class="feedback-grid">
+            {% for f in item.feedback %}
+            <div class="feedback-card">
+                <div class="status-icon {{ f.status }}">
+                    {% if f.status == 'success' %}✔{% elif f.status == 'fail' %}✖{% else %}•{% endif %}
+                </div>
+                <div class="feedback-text">
+                    <div class="judul">{{ f.judul }}</div>
+                    <div class="saran">{{ f.saran }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+</div>
+<hr style="border: 1px solid #ccc; margin: 40px 0;">
+{% endfor %}
+
+{% endif %}
+
+ <a href="{{ url_for('scan') }}" class="btn btn-secondary mt-3">Kembali ke Scan</a>
+    </div>
+<style>
+    .score {
+        float: right;
+        background: #dcfce7;
+        color: #15803d;
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+    .card {
+        margin-bottom: 10px;
+        background-color: #f8f8f9;
+    }
+    .btn-link {
+        text-decoration: none;
+    }
+    .feedback-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.feedback-card {
+    display: flex;
+    background-color: #efeff1;
+    padding: 10px;
+    border-radius: 10px;
+    align-items: flex-start;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+.status-icon {
+    font-size: 18px;
+    font-weight: bold;
+    width: 32px;
+    height: 32px;
+    text-align: center;
+    line-height: 32px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+.status-icon.success {
+    background-color: #d1fae5;
+    color: #16a34a;
+}
+.status-icon.fail {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+.status-icon.neutral {
+    background-color: #e0e7ff;
+    color: #3b82f6;
+}
+.feedback-text .judul {
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+.feedback-text .saran {
+    font-size: 14px;
+    color: #475569;
+}
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+
+  {% for item in feedback_section %}
+    // Chart
+    const chartCtx{{ loop.index }} = document.getElementById('donutChart{{ loop.index }}').getContext('2d');
+    new Chart(chartCtx{{ loop.index }}, {
+      type: 'doughnut',
+      data: {
+        labels: ['Score', 'Remaining'],
+        datasets: [{
+          data: [{{ item.score }}, {{ 100 - item.score }}],
+          backgroundColor: ['#E68369', '#f3f4f6'],
+        }]
+      },
+      options: {
+        cutout: '70%',
+        plugins: { legend: { display: false } },
+        elements: { arc: { borderWidth: 0 } }
+      }
+    });
+
+    // Adjust PDF embed height
+    const embedEl{{ loop.index }} = document.getElementById('embed{{ loop.index }}');
+    const feedbackColEl{{ loop.index }} = document.getElementById('feedback-col{{ loop.index }}');
+    if (embedEl{{ loop.index }} && feedbackColEl{{ loop.index }}) {
+      embedEl{{ loop.index }}.style.height = feedbackColEl{{ loop.index }}.offsetHeight + 'px';
+    }
+
+  {% endfor %}
+
+});
+</script>
+
+
+
+
+
+
+{% endblock %}

@@ -1,0 +1,167 @@
+{% extends "main_layout.html" %}
+{% block content %}
+<div class="custom-container-regis">
+    <h1 class="regis-title">Register Here!</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert-messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+    <div class="social-buttons-regis">
+        <button type="button" class="btn btn-google" onclick="window.location.href='{{ url_for('login_google') }}'">
+            <img src="{{ url_for('static', filename='image/google.png') }}" alt="Google Icon" class="icon-google">
+            Sign in with Google
+        </button>
+    </div>
+
+    <form action="{{ url_for('req_register') }}" method="post" class="regis-form-container">
+                    <!-- ROLE PILIHAN DITAMPILKAN PALING ATAS -->
+            <div class="form-outline-regis role-selection">
+                <label class="form-label-regis">Daftar Sebagai:</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="role" id="rolePerekrut" value="Perekrut" required>
+                    <label class="form-check-label" for="rolePerekrut">
+                        Perusahaan
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="role" id="rolePelamar" value="Pelamar" required checked>
+                    <label class="form-check-label" for="rolePelamar">
+                        Pelamar
+                    </label>
+                </div>
+            </div>
+
+        <div class="form-grid">
+
+                      <div class="form-outline-regis">
+    <label class="form-label-regis" for="nama" id="namaLabel">Nama Lengkap </label>
+    <input type="text" name="nama" id="nama" class="form-control-regis" placeholder="Nama Lengkap" required>
+</div>
+
+<div class="form-outline-regis" id="perusahaanField" style="display:none;">
+    <label class="form-label-regis" for="nama_perusahaan">Nama Perusahaan</label>
+    <input type="text" name="nama_perusahaan" id="nama_perusahaan" class="form-control-regis" placeholder="Nama Perusahaan">
+</div>
+
+            <div class="form-outline-regis">
+                <label class="form-label-regis" for="username">Username</label>
+                <input type="text" name="username" id="username" class="form-control-regis" placeholder="Username" required>
+            </div>
+            
+            <div class="form-outline-regis">
+                <label class="form-label-regis" for="loginEmail">Email</label>
+                <input type="email" name="email" id="loginEmail" class="form-control-regis" placeholder="Email" required>
+            </div>
+
+            <div class="form-outline-regis">
+                <label class="form-label-regis" for="loginPassword">Password</label>
+                <input type="password" name="password" id="loginPassword" class="form-control-regis" placeholder="Password" required>
+            </div>
+
+        </div>
+        <button type="submit" class="btn btn-register">Register</button>
+    </form>
+
+    <div class="login-link">
+        <p>Have an account? <a href="/login">Login</a></p>
+    </div>
+</div>
+
+<!-- MODAL GOOGLE -->
+<div class="modal fade" id="roleSelectionModal" tabindex="-1" aria-labelledby="roleSelectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="roleSelectionModalLabel">Daftar Sebagai</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('process_google_role') }}" method="post">
+                <div class="modal-body">
+                    <p>Silakan pilih jenis akun Anda:</p>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="radio" name="role" id="modalRolePerekrut" value="Perekrut" required>
+                        <label class="form-check-label" for="modalRolePerekrut">
+                            Perusahaan
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="role" id="modalRolePelamar" value="Pelamar" required checked>
+                        <label class="form-check-label" for="modalRolePelamar">
+                            Pelamar
+                        </label>
+                    </div>
+                    <input type="hidden" name="email" id="modalEmail">
+                    <input type="hidden" name="name" id="modalName">
+                    <input type="hidden" name="username" id="modalUsername">
+                    <input type="hidden" name="is_new_user" id="modalIsNewUser">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Lanjutkan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // MODAL ROLE GOOGLE
+    const roleSelectionModalElement = document.getElementById('roleSelectionModal');
+    const roleSelectionModal = new bootstrap.Modal(roleSelectionModalElement);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const showRoleModal = urlParams.get('show_role_modal'); 
+    const email = urlParams.get('email');
+    const name = urlParams.get('name');
+    const username = urlParams.get('username');
+    const isNewUser = urlParams.get('is_new_user');
+
+    if (showRoleModal === 'true' && email && name && username && isNewUser === 'true') { 
+        document.getElementById('modalEmail').value = email;
+        document.getElementById('modalName').value = name;
+        document.getElementById('modalUsername').value = username;
+        document.getElementById('modalIsNewUser').value = isNewUser;
+        roleSelectionModal.show();
+
+        urlParams.delete('show_role_modal');
+        urlParams.delete('email');
+        urlParams.delete('name');
+        urlParams.delete('username');
+        urlParams.delete('is_new_user');
+        const newUrl = window.location.origin + window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+        window.history.replaceState({}, document.title, newUrl);
+    }
+
+    // Logika Role Perekrut & Pelamar
+    const rolePerekrut = document.getElementById('rolePerekrut');
+    const rolePelamar = document.getElementById('rolePelamar');
+    const namaLabel = document.getElementById('namaLabel');
+    const namaInput = document.getElementById('nama');
+    const perusahaanField = document.getElementById('perusahaanField');
+
+    function toggleFields() {
+        if (rolePerekrut.checked) {
+            perusahaanField.style.display = 'block';
+            namaLabel.innerText = "Nama Lengkap / PIC";
+            namaInput.placeholder = "Nama Penanggung Jawab";
+        } else {
+            perusahaanField.style.display = 'none';
+            namaLabel.innerText = "Nama Lengkap";
+            namaInput.placeholder = "Nama Lengkap";
+        }
+    }
+
+    rolePerekrut.addEventListener('change', toggleFields);
+    rolePelamar.addEventListener('change', toggleFields);
+
+    // Panggil sekali untuk memastikan saat reload
+    toggleFields();
+});
+</script>
+{% endblock %}

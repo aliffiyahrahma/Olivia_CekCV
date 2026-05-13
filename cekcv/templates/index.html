@@ -1,0 +1,268 @@
+{% extends "main_layout.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>CekCV - Dashboard</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Poppins&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> {# Pastikan path CSS benar #}
+    <title>Dashboard</title>
+</head>
+
+<body>
+    
+    <div class="container-dashboard">
+        <div class="col1-dashboard">
+            <div class="horizontal-text">
+                <h1>
+                    <span class="half-color">CV Match with</span>
+                    <span class="normal-color">Job Description</span>
+                </h1>               
+                <p>CekCV assists in analyzing CVs to ensure they align with job descriptions.</p>
+                <p>Enjoy your experience with us!</p>
+                <h4><span class="half-color">Smart CV, Smart Career, Strong Economy</span></h4>
+                <a href="{{ url_for('scan') }}" class="scan-button">Scan Your CV Now</a>
+            </div>
+        </div>
+        <div class="col2-dashboard">
+            <img src="{{ url_for('static', filename='image/match.png') }}" width="480" alt="CV Match Image">
+        </div>
+    </div>
+
+    <div class="about-container">
+        <img src="{{ url_for('static', filename='image/tanya.png') }}" alt="Tanya Image">
+        <div class="text-container">
+            <h2 style="font-weight: bold;">Why CekCV was created ?</h2>
+            <p>Proses rekrutmen merupakan tahapan krusial dalam pengelolaan sumber daya manusia yang 
+                menentukan kualitas tenaga kerja suatu organisasi. Namun di era digital saat ini, 
+                perusahaan dihadapkan pada tantangan baru dengan meningkatnya volume lamaran pekerjaan, 
+                terutama di industri yang berkembang pesat. Hal ini menyebabkan proses penyaringan 
+                menjadi semakin rumit dan memakan waktu. </p>
+            <p>Oleh karena itu, diperlukan suatu sistem yang dapat mengoptimalkan proses penyaringan dengan lebih efisien dan efektif. CekCV hadir membantu anda menganalisis dan mengukur kesesuaian antara CV 
+                pelamar dengan deskripsi pekerjaan.</p>
+                
+        </div>
+    </div>
+
+    <div class="content-container">
+        <div class="text-container">
+            <h2 style="font-weight: bold;">Apakah Anda lelah mencari kandidat yang sempurna di antara banyaknya CV?</h2>
+            <p>Dengan layanan unggulan kami, kami siap membantu Anda mencocokkan CV dengan 
+                deskripsi pekerjaan, memastikan Anda mendapatkan kandidat yang paling sesuai.</p>
+        </div>
+        <img src="{{ url_for('static', filename='image/step.png') }}" alt="Step Image">
+    </div>
+
+    <div class="history-section" style"justify-content: center;" >
+
+        
+<div class="testimonial-section">
+    <h2 class="testimonial-title">Our Customer Feedback</h2>
+    <p class="testimonial-subtitle">Don't take our word for it. Trust our customers</p>
+            <div class="carousel-container">
+                <button class="carousel-btn prev" onclick="moveSlide(-1)">&#8592; Previous</button>
+                <button class="carousel-btn next" onclick="moveSlide(1)">Next &#8594;</button>
+            <div class="carousel-viewport">
+        <div class="carousel-track" id="carousel-track">
+        <!-- Review Card 1 -->
+        <div class="testimonial-card">
+        <div class="user-img">👤</div>
+            <div class="testimonial-content">
+            <div class="stars">★ ★ ★ ★ ☆</div>
+            <h3>Algatha Yoanka</h3>
+            <p>Sistem ini sangat membantu sekali!!!</p>
+            </div>
+        </div>
+
+      <!-- Review Card 2 -->
+      <div class="testimonial-card">
+       <div class="user-img">👤</div>
+        <div class="testimonial-content">
+          <div class="stars">★ ★ ★ ★ ☆</div>
+          <h3>Agsa Nugroho</h3>
+          <p>Memudahkan proses rekrutmen, dan tentunya sangat memuaskann</p>
+        </div>
+      </div>
+
+      <!-- Review Card 3 -->
+      <div class="testimonial-card">
+        <div class="user-img">👤</div>
+        <div class="testimonial-content">
+          <div class="stars">★ ★ ★ ★ ☆</div>
+          <h3>Pandhu Wicaksono</h3>
+          <p>Sangat terbantu sekali tentunya dengan adanya sistem ini, saya sangat suka.</p>
+        </div>
+      </div>
+
+      <!-- Review Card 4 -->
+      <div class="testimonial-card">
+        <div class="user-img">👤</div>
+        <div class="testimonial-content">
+          <div class="stars">★ ★ ★ ★ ★</div>
+          <h3>Angel Karamoy</h3>
+          <p>Fitur yang sangat membantu untuk screening kandidat, efisien dan efektif! Saya merasa lebih mudah dalam menyeleksi CV.</p>
+        </div>
+      </div>
+
+      <!-- Review Card 5 -->
+      <div class="testimonial-card">
+        <div class="user-img">👤</div>
+        <div class="testimonial-content">
+          <div class="stars">★ ★ ★ ★ ☆</div>
+          <h3>Aisyah</h3>
+          <p>Dengan CekCV, saya bisa menilai kesesuaian kandidat dengan lebih objektif. Tool-nya sangat praktis dan bermanfaat.</p>
+        </div>
+      </div>
+
+      <!-- Review Card 6 -->
+      <div class="testimonial-card">
+        <div class="user-img">👤</div>
+        <div class="testimonial-content">
+          <div class="stars">★ ★ ★ ★ ★</div>
+          <h3>Regina</h3>
+          <p>Proses screening jadi lebih cepat dan akurat dengan CekCV! Sangat saya rekomendasikan untuk tim HR modern.</p>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <div class="carousel-dots" id="carousel-dots">
+      <span class="dot active" onclick="goToSlide(0)"></span>
+      <span class="dot" onclick="goToSlide(1)"></span>
+    </div>
+  </div>
+</div>
+{% if user_role == 'Perekrut' %}
+<div class="cingpups">
+    <div class="testimonial-sectionn"> {# Ini adalah container umum untuk bagian history #}
+        <h2 class="history-title">History Hasil Scan Terbaik Anda</h2>
+        {% if history %}
+            {# Gunakan Bootstrap table classes #}
+            <div class="table-responsive"> {# Membuat tabel responsif, ada scrollbar horizontal jika konten terlalu lebar #}
+                <table class="table table-striped table table-hover table-bordered history-table"> {# table-striped untuk selang-seling warna baris, table-hover untuk efek hover, table-bordered untuk border #}
+                   <thead class="custom-header"> {# Header tabel gelap #}
+                        <tr>
+                            <th scope="col">No</th>
+                            <th scope="col">Tanggal Scan</th>
+                            <th scope="col" class="wide-description">Deskripsi Pekerjaan</th>
+                            <th scope="col">CV Terbaik 1</th>
+                            <th scope="col">Skor 1</th>
+                            <th scope="col">CV Terbaik 2</th>
+                            <th scope="col">Skor 2</th>
+                            <th scope="col">CV Terbaik 3</th>
+                            <th scope="col">Skor 3</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for scan in history %}
+                        <tr>
+                            <th scope="row">{{ loop.index }}</th> {# Nomor urut baris #}
+                            <td>{{ scan.created_at }}</td>
+                            <td class="wide-description">{{ scan.job_description | truncate(100, true, '...') }}</td>
+                            
+                            {# Kandidat 1 #}
+                            <td>
+                                {% if scan.candidates|length >= 1 %}
+                                    {{ scan.candidates[0].name | truncate(20, True, '...') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if scan.candidates|length >= 1 %}
+                                    <span class="badge bg-success">{{ "%.2f"|format(scan.candidates[0].score ) }}%</span>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+
+                            {# Kandidat 2 #}
+                            <td>
+    {% if scan.candidates|length >= 2 %}
+        {{ scan.candidates[1].name | truncate(20, True, '...') }}
+    {% else %}
+        -
+    {% endif %}
+</td>
+
+
+                            <td>
+                                {% if scan.candidates|length >= 2 %}
+                                    <span class="badge bg-info">{{ "%.2f"|format(scan.candidates[1].score ) }}%</span>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            
+                            {# Kandidat 3 #}
+                            <td>
+                                {% if scan.candidates|length >= 3 %}
+                                    {{ scan.candidates[2].name | truncate(20, True, '...')}}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if scan.candidates|length >= 3 %}
+                                    <span class="badge bg-warning">{{ "%.2f"|format(scan.candidates[2].score ) }}%</span>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-center text-muted fs-5 mt-4">Belum ada riwayat scan yang tersedia. Mulai scan CV Anda sekarang!</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+  const track = document.getElementById("carousel-track");
+  const cards = document.querySelectorAll(".testimonial-card");
+  const dots = document.querySelectorAll(".dot");
+
+  let currentSlide = 0;
+  const cardsPerSlide = 3;
+  const totalSlides = Math.ceil(cards.length / cardsPerSlide);
+
+  function updateSlide(index) {
+    const cardWidth = cards[0].offsetWidth + 20; // 20px = gap
+    const moveX = index * cardWidth * cardsPerSlide;
+    track.style.transform = `translateX(-${moveX}px)`;
+
+    dots.forEach(dot => dot.classList.remove("active"));
+    dots[index].classList.add("active");
+
+    currentSlide = index;
+  }
+
+  function moveSlide(step) {
+    let nextSlide = currentSlide + step;
+    if (nextSlide < 0) nextSlide = totalSlides - 1;
+    if (nextSlide >= totalSlides) nextSlide = 0;
+    updateSlide(nextSlide);
+  }
+
+  function goToSlide(index) {
+    updateSlide(index);
+  }
+
+  setInterval(() => {
+    moveSlide(1);
+  }, 7000); // Auto slide every 7s
+
+  // Optional: Make sure layout is correct on resize
+  window.addEventListener("resize", () => updateSlide(currentSlide));
+</script>
+
+</body>
+</html>
+{% endblock %}
